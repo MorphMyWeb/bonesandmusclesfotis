@@ -1,765 +1,330 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Ostéa — Διαδραστικός Άτλας Μυοσκελετικού Συστήματος</title>
-<meta name="description" content="Ένα κινηματογραφικό 3D ταξίδι στο ανθρώπινο μυοσκελετικό σύστημα: οστά, μύες, αρθρώσεις, παθήσεις." />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#0a0a14;
-    --bg-2:#10101e;
-    --card:#161624;
-    --border:#262638;
-    --fg:#f3eedf;
-    --muted:#8b8aa0;
-    --bone:#f1e5c9;
-    --bone-2:#d9c79a;
-    --accent:#d93a3a;
-    --accent-2:#ff7a4d;
-    --gradient-accent:linear-gradient(135deg,#d93a3a,#ff7a4d);
-    --gradient-bone:linear-gradient(135deg,#f5ead0,#c8b078);
-    --gradient-hero:radial-gradient(ellipse at top,rgba(217,58,58,.25),transparent 60%),linear-gradient(180deg,#10101e,#06060c);
-    --shadow-glow:0 0 80px -10px rgba(217,58,58,.5);
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{
-    background:var(--bg);
-    color:var(--fg);
-    font-family:'Inter',system-ui,sans-serif;
-    -webkit-font-smoothing:antialiased;
-    overflow-x:hidden;
-    line-height:1.5;
-  }
-  h1,h2,h3,h4{font-family:'Cormorant Garamond',serif;letter-spacing:-.01em;font-weight:500;line-height:1.05}
-  a{color:inherit;text-decoration:none}
-  img{display:block;max-width:100%}
-  em{font-style:italic}
-  .container{max-width:1240px;margin:0 auto;padding:0 24px}
-  @media(min-width:1024px){.container{padding:0 40px}}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Τσιπουράδικο Το Κονάκι | Κύμινα</title>
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-  .text-gradient-bone{background:var(--gradient-bone);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .text-gradient-accent{background:var(--gradient-accent);-webkit-background-clip:text;background-clip:text;color:transparent}
+    <style>
+        :root {
+            --gold: #d4af37;
+            --dark-bg: #050505;
+            --glass: rgba(255, 255, 255, 0.08);
+            --text: #ffffff;
+        }
 
-  /* HEADER */
-  header{
-    position:fixed;top:0;left:0;right:0;z-index:50;
-    transition:all .5s ease;padding:18px 0;
-  }
-  header.scrolled{
-    background:rgba(10,10,20,.7);
-    backdrop-filter:blur(20px);
-    -webkit-backdrop-filter:blur(20px);
-    border-bottom:1px solid var(--border);
-  }
-  .nav{display:flex;align-items:center;justify-content:space-between;gap:24px}
-  .logo{display:flex;align-items:center;gap:12px}
-  .logo-mark{
-    width:42px;height:42px;border-radius:50%;
-    background:var(--gradient-accent);
-    display:grid;place-items:center;
-    box-shadow:var(--shadow-glow);
-    font-family:'Cormorant Garamond',serif;font-size:22px;color:#fff;
-  }
-  .logo-text{font-family:'Cormorant Garamond',serif;font-size:22px}
-  .logo-sub{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted)}
-  .nav-links{display:none;gap:4px}
-  @media(min-width:900px){.nav-links{display:flex}}
-  .nav-links a{
-    padding:8px 16px;border-radius:999px;
-    font-size:14px;color:var(--muted);
-    transition:all .3s ease;
-  }
-  .nav-links a:hover,.nav-links a.active{color:var(--fg);background:#1d1d2c}
-  .btn{
-    display:inline-flex;align-items:center;gap:8px;
-    padding:14px 28px;border-radius:999px;
-    background:var(--accent);color:#fff;font-weight:500;font-size:14px;
-    border:none;cursor:pointer;
-    box-shadow:var(--shadow-glow);
-    transition:transform .3s,opacity .3s;
-  }
-  .btn:hover{opacity:.9;transform:translateY(-2px)}
-  .btn-ghost{
-    background:rgba(22,22,36,.4);
-    backdrop-filter:blur(10px);
-    border:1px solid var(--border);
-    box-shadow:none;
-  }
-  .btn-ghost:hover{border-color:var(--accent)}
+        body {
+            margin: 0;
+            background-color: var(--dark-bg);
+            color: var(--text);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+        }
 
-  /* HERO */
-  .hero{
-    position:relative;min-height:100vh;
-    background:var(--gradient-hero);
-    overflow:hidden;
-    display:flex;align-items:center;
-  }
-  .hero canvas{position:absolute!important;inset:0;width:100%!important;height:100%!important}
-  .hero-mask{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,20,.2),transparent 30%,rgba(10,10,20,.9));pointer-events:none}
-  .hero-grid{
-    position:relative;z-index:2;width:100%;
-    display:grid;grid-template-columns:1fr;gap:40px;align-items:center;
-    padding:120px 0 80px;
-  }
-  @media(min-width:1024px){.hero-grid{grid-template-columns:1fr 1fr}}
-  .kicker{
-    display:inline-flex;align-items:center;gap:10px;
-    padding:6px 16px;border-radius:999px;
-    border:1px solid var(--border);background:rgba(22,22,36,.4);
-    backdrop-filter:blur(10px);
-    font-size:11px;letter-spacing:.3em;text-transform:uppercase;
-    margin-bottom:28px;
-  }
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s ease-in-out infinite}
-  @keyframes pulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.4);box-shadow:0 0 20px var(--accent)}}
-  .hero h1{font-size:clamp(48px,8vw,108px);margin-bottom:28px}
-  .hero p{font-size:18px;color:var(--muted);max-width:480px;margin-bottom:36px;line-height:1.6}
-  .hero-cta{display:flex;flex-wrap:wrap;gap:14px}
-  .scroll-hint{
-    position:absolute;bottom:32px;left:0;right:0;text-align:center;z-index:3;
-    font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:var(--muted);
-    animation:float 3s ease-in-out infinite;
-  }
-  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
 
-  /* STATS */
-  .stats{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(22,22,36,.4)}
-  .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:32px;padding:64px 0}
-  @media(min-width:768px){.stats-grid{grid-template-columns:repeat(4,1fr)}}
-  .stat-value{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,5vw,64px);line-height:1;background:var(--gradient-bone);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:8px}
-  .stat-label{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted)}
+        header {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+        }
 
-  /* SECTION HEADERS */
-  section.block{padding:120px 0}
-  .section-head{display:grid;grid-template-columns:1fr;gap:40px;margin-bottom:64px;align-items:end}
-  @media(min-width:1024px){.section-head{grid-template-columns:1fr 1fr;gap:80px}}
-  .section-eyebrow{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
-  .section-head h2{font-size:clamp(40px,5vw,72px)}
-  .section-head p{color:var(--muted);font-size:17px;line-height:1.7;max-width:520px}
+        h1 {
+            font-size: clamp(3rem, 10vw, 6rem);
+            margin: 0;
+            color: var(--gold);
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+        }
 
-  /* CHAPTER 3D BLOCKS */
-  .chapter{
-    display:grid;grid-template-columns:1fr;gap:40px;align-items:center;
-    padding:80px 0;border-top:1px solid var(--border);
-  }
-  @media(min-width:900px){.chapter{grid-template-columns:1fr 1fr;gap:80px}}
-  .chapter.reverse .chapter-3d{order:-1}
-  @media(min-width:900px){.chapter.reverse .chapter-3d{order:2}}
-  .chapter-3d{
-    position:relative;aspect-ratio:1/1;border-radius:24px;overflow:hidden;
-    background:radial-gradient(circle at 30% 30%,#1a1a2c,#08080f);
-    border:1px solid var(--border);
-  }
-  .chapter-3d canvas{position:absolute!important;inset:0;width:100%!important;height:100%!important}
-  .chapter-num{font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--accent);letter-spacing:.3em;text-transform:uppercase;margin-bottom:20px}
-  .chapter h3{font-size:clamp(40px,5vw,64px);margin-bottom:24px}
-  .chapter-text{color:var(--muted);font-size:17px;line-height:1.75;margin-bottom:24px}
-  .chapter-list{list-style:none;display:grid;gap:14px}
-  .chapter-list li{padding-left:28px;position:relative;color:var(--muted);font-size:15px}
-  .chapter-list li:before{content:"";position:absolute;left:0;top:10px;width:14px;height:1px;background:var(--accent)}
+        .hero-subtitle {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            margin: 18px 0 10px;
+            letter-spacing: 1px;
+        }
 
-  /* GRID CARDS */
-  .grid-cards{display:grid;grid-template-columns:1fr;gap:20px}
-  @media(min-width:640px){.grid-cards{grid-template-columns:repeat(2,1fr)}}
-  @media(min-width:1024px){.grid-cards{grid-template-columns:repeat(3,1fr)}}
-  .card{
-    position:relative;padding:32px;border-radius:20px;
-    background:var(--card);border:1px solid var(--border);
-    transition:all .5s ease;overflow:hidden;
-  }
-  .card:hover{border-color:rgba(217,58,58,.6);transform:translateY(-4px)}
-  .card:hover .card-glow{opacity:1}
-  .card-glow{position:absolute;top:-80px;right:-80px;width:200px;height:200px;border-radius:50%;background:rgba(217,58,58,.2);filter:blur(60px);opacity:0;transition:opacity .7s}
-  .card-num{position:relative;font-family:'Cormorant Garamond',serif;font-size:48px;background:var(--gradient-bone);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:12px}
-  .card h4{position:relative;font-size:24px;margin-bottom:10px}
-  .card p{position:relative;font-size:14px;color:var(--muted);line-height:1.6}
+        .hero-badges {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 20px;
+        }
 
-  /* CTA */
-  .cta{
-    position:relative;overflow:hidden;border-radius:28px;
-    border:1px solid var(--border);
-    background:linear-gradient(135deg,#1a1a2c,#0e0e18);
-    padding:64px 32px;
-  }
-  @media(min-width:768px){.cta{padding:88px}}
-  .cta:before{content:"";position:absolute;top:-100px;left:-100px;width:300px;height:300px;border-radius:50%;background:rgba(217,58,58,.3);filter:blur(80px)}
-  .cta:after{content:"";position:absolute;bottom:-100px;right:-100px;width:300px;height:300px;border-radius:50%;background:rgba(255,122,77,.15);filter:blur(80px)}
-  .cta-inner{position:relative;max-width:640px}
-  .cta h2{font-size:clamp(40px,5vw,72px);margin-bottom:20px}
-  .cta p{color:var(--muted);font-size:18px;margin-bottom:32px}
+        .hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.06);
+            color: #fff;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
 
-  /* FOOTER */
-  footer{border-top:1px solid var(--border);background:rgba(22,22,36,.4);margin-top:120px}
-  .footer-grid{display:grid;grid-template-columns:1fr;gap:48px;padding:80px 0}
-  @media(min-width:768px){.footer-grid{grid-template-columns:2fr 1fr 1fr 1fr}}
-  .footer-grid h5{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
-  .footer-grid ul{list-style:none;display:grid;gap:10px}
-  .footer-grid li a{font-size:14px;color:var(--fg);transition:color .3s}
-  .footer-grid li a:hover{color:var(--accent)}
-  .footer-brand{font-family:'Cormorant Garamond',serif;font-size:28px;margin-bottom:12px}
-  .footer-tag{color:var(--muted);font-size:14px;line-height:1.6;max-width:300px}
-  .footer-bottom{border-top:1px solid var(--border);padding:24px 0;text-align:center;font-size:12px;color:var(--muted)}
+        .hero-pill:hover {
+            transform: translateY(-3px);
+        }
 
-  /* REVEAL ON SCROLL */
-  .reveal{opacity:0;transform:translateY(40px);transition:opacity 1s ease,transform 1s ease}
-  .reveal.in{opacity:1;transform:translateY(0)}
-</style>
+        #shop-status {
+            font-weight: bold;
+            padding: 12px 25px;
+            border-radius: 50px;
+            background: rgba(0,0,0,0.6);
+            border: 2px solid currentColor;
+            display: inline-block;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            transition: 0.5s;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 28px;
+        }
+
+        .btn-call {
+            background: linear-gradient(135deg, #ffcf76, #e09b20);
+            color: black;
+            padding: 18px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            box-shadow: 0 20px 70px rgba(212, 175, 55, 0.2);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .btn-call:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 26px 90px rgba(212, 175, 55, 0.32);
+        }
+
+        .rating-pill {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.14);
+            padding: 12px 24px;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 30px;
+            padding: 50px;
+            margin-bottom: 60px;
+        }
+
+        h2 {
+            color: var(--gold);
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        /* Full Menu Grid */
+        .menu-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .category h3 {
+            color: var(--gold);
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            font-size: 1.6rem;
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            font-size: 1.15rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 5px;
+            transition: 0.3s;
+        }
+
+        .menu-item:hover {
+            color: var(--gold);
+            transform: scale(1.05);
+        }
+
+        .menu-item span:last-child { color: var(--gold); }
+
+        .map-container { width: 100%; height: 500px; border-radius: 20px; overflow: hidden; border: 2px solid var(--gold); }
+
+    </style>
 </head>
 <body>
 
-<header id="header">
-  <div class="container nav">
-    <a href="#top" class="logo">
-      <div class="logo-mark">Ο</div>
-      <div>
-        <div class="logo-text">Ostéa</div>
-        <div class="logo-sub">Μυοσκελετικός Άτλας</div>
-      </div>
-    </a>
-    <nav class="nav-links">
-      <a href="#top" class="active">Αρχική</a>
-      <a href="#bones">Οστά</a>
-      <a href="#muscles">Μύες</a>
-      <a href="#joints">Αρθρώσεις</a>
-      <a href="#conditions">Παθήσεις</a>
-      <a href="#about">Σχετικά</a>
-    </nav>
-    <a href="#bones" class="btn">Έναρξη</a>
-  </div>
-</header>
+    <canvas id="bg-canvas"></canvas>
 
-<!-- HERO -->
-<section class="hero" id="top">
-  <canvas id="hero-canvas"></canvas>
-  <div class="hero-mask"></div>
-  <div class="container hero-grid">
-    <div>
-      <div class="kicker"><span class="dot"></span> Διαδραστικός 3D Άτλας</div>
-      <h1>Το σώμα σου,<br/><span class="text-gradient-accent"><em>σε κίνηση.</em></span></h1>
-      <p>Εξερεύνησε το μυοσκελετικό σύστημα από μέσα. 206 οστά, πάνω από 650 μύες και αμέτρητες αρθρώσεις, σχεδιασμένα να συνεργάζονται τέλεια.</p>
-      <div class="hero-cta">
-        <a href="#bones" class="btn">Ξεκίνα την περιήγηση →</a>
-        <a href="#about" class="btn btn-ghost">Μάθε περισσότερα</a>
-      </div>
+    <header>
+        <h1 data-aos="zoom-in">Τσιπουράδικο Το Κονάκι</h1>
+        <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="300">Αυθεντικό τσιπουράδικο με 4,6 ★ και γνήσια μεζεδο-εμπειρία στην καρδιά των Κυμίνων</p>
+
+        <div class="hero-badges" data-aos="fade-up" data-aos-delay="500">
+            <div class="hero-pill rating-pill">4,6 ★ · 644 κριτικές</div>
+            <div class="hero-pill">10–30 € / άτομο</div>
+            <div class="hero-pill">Μεζεδοπωλείο · Φαγητό στον χώρο · Παραλαβή έξω</div>
+        </div>
+
+        <div class="hero-actions" data-aos="fade-up" data-aos-delay="700">
+            <div id="shop-status">● ΕΛΕΓΧΟΣ ΩΡΑΡΙΟΥ...</div>
+            <a href="tel:+302391042968" class="btn-call">Καλέστε τώρα</a>
+        </div>
+
+        <div style="margin-top: 26px; opacity: 0.85; font-size: 1rem; max-width: 760px;" data-aos="fade-up" data-aos-delay="900">
+            Άνοιγμα: Δευτέρα έως Κυριακή 11:00 π.μ.–11:30 μ.μ. (εκτός Τρίτης κλειστά). Ζήστε ψαρομεζέδες, καλαμαράκια, χωριάτικη σαλάτα, μύδια, ριζότο και γλυκό ημέρας.
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <!-- Το Πλήρες Μενού -->
+        <div class="glass-card" data-aos="fade-up">
+            <h2>Το Μενού μας</h2>
+            <div class="menu-section">
+                <!-- Θαλασσινά -->
+                <div class="category">
+                    <h3>Θαλασσινά</h3>
+                    <div class="menu-item"><span>Γαμπάρη</span> <span>★</span></div>
+                    <div class="menu-item"><span>Μύδια Αχνιστά</span> <span>★</span></div>
+                    <div class="menu-item"><span>Ριζότο Θαλασσινών</span> <span>★</span></div>
+                    <div class="menu-item"><span>Καλαμαράκια</span> <span>★</span></div>
+                    <div class="menu-item"><span>Grilled Sardines</span> <span>★</span></div>
+                    <div class="menu-item"><span>Vapor Mussels</span> <span>★</span></div>
+                    <div class="menu-item"><span>Κολοκυθάκια Τηγανητά</span> <span>★</span></div>
+                </div>
+
+                <!-- Ορεκτικά -->
+                <div class="category">
+                    <h3>Ορεκτικά & Μεζέδες</h3>
+                    <div class="menu-item"><span>Λευκός Ταραμάς</span> <span>★</span></div>
+                    <div class="menu-item"><span>Σαχανάκι</span> <span>★</span></div>
+                    <div class="menu-item"><span>Κολοκυθάκια Τηγανητά</span> <span>★</span></div>
+                    <div class="menu-item"><span>Bruschete</span> <span>★</span></div>
+                    <div class="menu-item"><span>Σνεζάνκα & Ελιές</span> <span>★</span></div>
+                    <div class="menu-item"><span>Κλασικό Γλυκό</span> <span>★</span></div>
+                </div>
+
+                <!-- Σαλάτες & Ειδικές -->
+                <div class="category">
+                    <h3>Σαλάτες & Specials</h3>
+                    <div class="menu-item"><span>Χωριάτικη Σαλάτα</span> <span>★</span></div>
+                    <div class="menu-item"><span>Σαλάτα Βραστών Λαχανικών</span> <span>★</span></div>
+                    <div class="menu-item"><span>Σαλάτα Ζόχι</span> <span>★</span></div>
+                    <div class="menu-item"><span>Sałatka Tsiproudotaki</span> <span>★</span></div>
+                    <div class="menu-item"><span>Ψαρικά</span> <span>★</span></div>
+                    <div class="menu-item"><span>Όστρακα</span> <span>★</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Τοποθεσία -->
+        <div class="glass-card" data-aos="fade-up" style="text-align: center;">
+            <h2>Βρείτε μας</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 30px;">Φιλίππου, Κύμινα 573 00, Θεσσαλονίκη</p>
+            <div class="map-container">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3027.683615467382!2d22.6917639!3d40.6148383!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1357da003310344d%3A0x63345862d98d227b!2sTo%20Konaki!5e0!3m2!1sel!2sgr!4v1715432000000!5m2!1sel!2sgr" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+            <a href="tel:+302391042968" class="btn-call">ΤΗΛΕΦΩΝΟ: 2391 042968</a>
+        </div>
     </div>
-    <div></div>
-  </div>
-  <div class="scroll-hint">↓ Κύλισε για να εξερευνήσεις</div>
-</section>
 
-<!-- STATS -->
-<section class="stats">
-  <div class="container stats-grid">
-    <div class="reveal"><div class="stat-value">206</div><div class="stat-label">Οστά</div></div>
-    <div class="reveal"><div class="stat-value">650+</div><div class="stat-label">Σκελετικοί Μύες</div></div>
-    <div class="reveal"><div class="stat-value">360</div><div class="stat-label">Αρθρώσεις</div></div>
-    <div class="reveal"><div class="stat-value">4×</div><div class="stat-label">Δύναμη του βάρους σου</div></div>
-  </div>
-</section>
+    <footer style="text-align: center; padding: 50px; opacity: 0.5;">
+        <p>&copy; 2026 Τσιπουράδικο Το Κονάκι - Κύμινα</p>
+    </footer>
 
-<!-- INTRO -->
-<section class="block">
-  <div class="container">
-    <div class="section-head reveal">
-      <div>
-        <div class="section-eyebrow">Τέσσερα κεφάλαια</div>
-        <h2>Μια ανατομία της <em class="text-gradient-bone">κίνησης</em>.</h2>
-      </div>
-      <p>Κάθε υποσύστημα του σώματός σου είναι ένα μικρό θαύμα μηχανικής. Από το μικροσκοπικό τύμπανο του αυτιού ως τον τεράστιο μηρό, όλα δουλεύουν μαζί σε τέλειο συντονισμό.</p>
-    </div>
-  </div>
-</section>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 1000 });
 
-<!-- CHAPTER 1: BONES -->
-<section class="block" id="bones" style="padding-top:0">
-  <div class="container">
-    <div class="chapter">
-      <div class="chapter-3d"><canvas id="bones-canvas"></canvas></div>
-      <div class="reveal">
-        <div class="chapter-num">01 — Σκελετικό Σύστημα</div>
-        <h3>Οστά: ζωντανή <em class="text-gradient-bone">αρχιτεκτονική</em>.</h3>
-        <p class="chapter-text">Τα οστά δεν είναι αδρανείς δοκοί — είναι ζωντανός ιστός που αναδομείται διαρκώς, αποθηκεύει ασβέστιο και παράγει αίμα στον μυελό τους.</p>
-        <ul class="chapter-list">
-          <li>Μακρά οστά: μηρός, βραχίονας, κνήμη</li>
-          <li>Πλατέα οστά: κρανίο, στέρνο, ωμοπλάτη</li>
-          <li>Ανώμαλα οστά: σπόνδυλοι, προσωπικά οστά</li>
-          <li>Σπογγώδης ιστός: ελάχιστο βάρος, μέγιστη αντοχή</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
+        // ΑΥΤΟΜΑΤΟ ΩΡΑΡΙΟ
+        function checkStatus() {
+            const now = new Date();
+            const hour = now.getHours();
+            const min = now.getMinutes();
+            const time = hour + (min / 60);
+            const statusBox = document.getElementById('shop-status');
 
-<!-- CHAPTER 2: MUSCLES -->
-<section class="block" id="muscles" style="padding-top:0">
-  <div class="container">
-    <div class="chapter reverse">
-      <div class="chapter-3d"><canvas id="muscles-canvas"></canvas></div>
-      <div class="reveal">
-        <div class="chapter-num">02 — Μυϊκό Σύστημα</div>
-        <h3>Μύες: η μηχανή της <em class="text-gradient-accent">κίνησης</em>.</h3>
-        <p class="chapter-text">Από τη μικροσκοπική συστολή μιας ίνας ως την εκτόξευση ενός σπρίντερ, οι μύες μετατρέπουν χημική ενέργεια σε καθαρή κίνηση — 100.000 φορές την ημέρα μόνο η καρδιά.</p>
-        <ul class="chapter-list">
-          <li>Σκελετικοί μύες: εκούσιοι, ραβδωτοί</li>
-          <li>Λείοι μύες: ακούσιοι, στα όργανα</li>
-          <li>Καρδιακός μυς: μοναδικός, αδιάκοπος</li>
-          <li>Ίνες αργής & ταχείας συστολής</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
+            // Ανοιχτά 11:00 έως 23:30, κλειστά Τρίτη
+            const isTuesday = now.getDay() === 2;
+            if (!isTuesday && time >= 11.0 && time < 23.5) {
+                statusBox.innerHTML = "● ΑΝΟΙΧΤΟ";
+                statusBox.style.color = "#27ae60";
+                statusBox.style.borderColor = "#27ae60";
+            } else {
+                statusBox.innerHTML = "● ΚΛΕΙΣΤΟ";
+                statusBox.style.color = "#e74c3c";
+                statusBox.style.borderColor = "#e74c3c";
+            }
+        }
+        checkStatus();
+        setInterval(checkStatus, 30000);
 
-<!-- CHAPTER 3: JOINTS -->
-<section class="block" id="joints" style="padding-top:0">
-  <div class="container">
-    <div class="chapter">
-      <div class="chapter-3d"><canvas id="joints-canvas"></canvas></div>
-      <div class="reveal">
-        <div class="chapter-num">03 — Αρθρικό Σύστημα</div>
-        <h3>Αρθρώσεις: μηχανική σε <em class="text-gradient-bone">τέλεια ισορροπία</em>.</h3>
-        <p class="chapter-text">Κάθε άρθρωση είναι ένας μηχανικός συμβιβασμός: όσο περισσότερη κίνηση επιτρέπει, τόσο λιγότερη σταθερότητα προσφέρει. Ένα στρώμα χόνδρου χιλιοστών αντέχει εκατομμύρια κάμψεις.</p>
-        <ul class="chapter-list">
-          <li>Σφαιροειδείς: ώμος, ισχίο</li>
-          <li>Γίγγλυμες: γόνατο, αγκώνας</li>
-          <li>Στροφικές: άτλας–άξονας</li>
-          <li>Εφιππιοειδής: ο αντίχειρας του ανθρώπου</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
+        // 3D BACKGROUND
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        
+        const geometry = new THREE.IcosahedronGeometry(0.2, 0);
+        const material = new THREE.MeshBasicMaterial({ color: 0xd4af37, wireframe: true });
+        const particles = [];
+        
+        for(let i=0; i<160; i++) {
+            const p = new THREE.Mesh(geometry, material);
+            const [x, y, z] = Array(3).fill().map(() => THREE.MathUtils.randFloatSpread(90));
+            p.position.set(x, y, z);
+            scene.add(p);
+            particles.push(p);
+        }
+        camera.position.z = 45;
 
-<!-- CHAPTER 4: SPINE / CONDITIONS -->
-<section class="block" id="conditions" style="padding-top:0">
-  <div class="container">
-    <div class="chapter reverse">
-      <div class="chapter-3d"><canvas id="spine-canvas"></canvas></div>
-      <div class="reveal">
-        <div class="chapter-num">04 — Παθολογία</div>
-        <h3>Όταν το σύστημα <em class="text-gradient-accent">χρειάζεται προσοχή</em>.</h3>
-        <p class="chapter-text">Πάνω από 1,7 δισ. άνθρωποι παγκοσμίως αντιμετωπίζουν μυοσκελετικά προβλήματα. Η πλειοψηφία αναπτύσσεται σιωπηλά — και προλαμβάνεται με κίνηση, διατροφή και έγκαιρο έλεγχο.</p>
-        <ul class="chapter-list">
-          <li>Οστεοπόρωση & οστεοαρθρίτιδα</li>
-          <li>Σκολίωση & δισκοκήλη</li>
-          <li>Ρευματοειδής αρθρίτιδα</li>
-          <li>Τενοντίτιδες υπερχρήσης</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
+        function animate() {
+            requestAnimationFrame(animate);
+            particles.forEach(p => {
+                p.rotation.x += 0.01;
+                p.position.y += 0.03;
+                if(p.position.y > 45) p.position.y = -45;
+            });
+            renderer.render(scene, camera);
+        }
+        animate();
 
-<!-- CARDS / CONDITIONS DETAIL -->
-<section class="block" style="padding-top:0">
-  <div class="container">
-    <div class="section-head reveal">
-      <div>
-        <div class="section-eyebrow">Παθολογία σε λεπτομέρεια</div>
-        <h2>Γνώρισε. <em class="text-gradient-accent">Πρόλαβε.</em></h2>
-      </div>
-      <p>Έξι από τις πιο συχνές μυοσκελετικές καταστάσεις. Η πληροφόρηση είναι το πρώτο βήμα — μια συζήτηση με τον γιατρό σου είναι το επόμενο.</p>
-    </div>
-    <div class="grid-cards">
-      <div class="card reveal"><div class="card-glow"></div><div class="card-num">01</div><h4>Οστεοπόρωση</h4><p>Σταδιακή απώλεια οστικής μάζας. Πρόληψη: ασβέστιο, βιταμίνη D, ασκήσεις αντίστασης.</p></div>
-      <div class="card reveal"><div class="card-glow"></div><div class="card-num">02</div><h4>Οστεοαρθρίτιδα</h4><p>Φθορά του χόνδρου — η πιο κοινή μορφή αρθρίτιδας μετά τα 50.</p></div>
-      <div class="card reveal"><div class="card-glow"></div><div class="card-num">03</div><h4>Ρευματοειδής αρθρίτιδα</h4><p>Αυτοάνοση επίθεση στις αρθρώσεις, διαχειρίσιμη με σύγχρονες βιολογικές θεραπείες.</p></div>
-      <div class="card reveal"><div class="card-glow"></div><div class="card-num">04</div><h4>Σκολίωση</h4><p>Πλάγια καμπύλωση της σπονδυλικής στήλης. Συχνά αναπτύσσεται στην εφηβεία.</p></div>
-      <div class="card reveal"><div class="card-glow"></div><div class="card-num">05</div><h4>Δισκοκήλη</h4><p>Προβολή δίσκου που πιέζει νεύρο — πόνος που ακτινοβολεί στο πόδι ή το χέρι.</p></div>
-      <div class="card reveal"><div class="card-glow"></div><div class="card-num">06</div><h4>Τενοντίτιδα</h4><p>Φλεγμονή τένοντα από επαναλαμβανόμενη χρήση — ξεκούραση και ενδυνάμωση είναι το αντίδοτο.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- ABOUT / CTA -->
-<section class="block" id="about" style="padding-top:40px">
-  <div class="container">
-    <div class="cta reveal">
-      <div class="cta-inner">
-        <div class="section-eyebrow">Σχετικά με το Ostéa</div>
-        <h2>Ένας <em class="text-gradient-accent">άτλας</em> για το σώμα, φτιαγμένος με <em class="text-gradient-bone">προσοχή</em>.</h2>
-        <p>Δωρεάν, χωρίς εγγραφή, χωρίς διαφημίσεις. Φτιαγμένο με WebGL για όποιον αγαπά την ανατομία και την κίνηση.</p>
-        <a href="#top" class="btn">Επιστροφή στην αρχή ↑</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="container footer-grid">
-    <div>
-      <div class="footer-brand">Ostéa</div>
-      <p class="footer-tag">Ένα διαδραστικό 3D ταξίδι μέσα στο μυοσκελετικό σύστημα του ανθρώπινου σώματος.</p>
-    </div>
-    <div>
-      <h5>Εξερεύνηση</h5>
-      <ul><li><a href="#bones">Οστά</a></li><li><a href="#muscles">Μύες</a></li><li><a href="#joints">Αρθρώσεις</a></li><li><a href="#conditions">Παθήσεις</a></li></ul>
-    </div>
-    <div>
-      <h5>Πόροι</h5>
-      <ul><li><a href="#about">Σχετικά</a></li><li><a href="#about">Επιστημονική ομάδα</a></li><li><a href="#about">Πηγές</a></li></ul>
-    </div>
-    <div>
-      <h5>Επικοινωνία</h5>
-      <ul><li>info@ostea.gr</li><li>Αθήνα, Ελλάδα</li></ul>
-    </div>
-  </div>
-  <div class="footer-bottom">© <span id="yr"></span> Ostéa — Όλα τα δικαιώματα διατηρούνται.</div>
-</footer>
-
-<!-- THREE.JS via importmap -->
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
-
-<script type="module">
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-
-document.getElementById('yr').textContent = new Date().getFullYear();
-
-// header scroll
-const header = document.getElementById('header');
-addEventListener('scroll', () => header.classList.toggle('scrolled', scrollY > 30));
-
-// reveal on scroll
-const io = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
-}, { threshold: 0.15 });
-document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-
-// Active nav highlighting
-const sections = ['top','bones','muscles','joints','conditions','about'];
-const navLinks = document.querySelectorAll('.nav-links a');
-addEventListener('scroll', () => {
-  let current = 'top';
-  for (const id of sections) {
-    const el = document.getElementById(id);
-    if (el && el.getBoundingClientRect().top < 200) current = id;
-  }
-  navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + current));
-});
-
-// ─────────────────────────────────────────────
-// SHARED SCENE FACTORY
-// ─────────────────────────────────────────────
-function createScene(canvas, opts = {}) {
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.1;
-
-  const scene = new THREE.Scene();
-  if (opts.bg !== false) scene.background = null;
-
-  const camera = new THREE.PerspectiveCamera(opts.fov || 45, 1, 0.1, 100);
-  camera.position.set(...(opts.cam || [0, 0.5, 7]));
-
-  // env (subtle reflections)
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-
-  // lights
-  scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-  const key = new THREE.DirectionalLight(0xffe1c0, 1.4);
-  key.position.set(5, 6, 4); scene.add(key);
-  const fill = new THREE.PointLight(0xff5a55, 1.2, 30); fill.position.set(-3, 2, 4); scene.add(fill);
-  const rim = new THREE.DirectionalLight(0x6688ff, 0.4); rim.position.set(-4, -2, -3); scene.add(rim);
-
-  let controls;
-  if (opts.controls !== false) {
-    controls = new OrbitControls(camera, canvas);
-    controls.enableZoom = false; controls.enablePan = false;
-    controls.minPolarAngle = Math.PI / 3.2;
-    controls.maxPolarAngle = Math.PI / 1.5;
-    controls.enableDamping = true;
-  }
-
-  function resize() {
-    const w = canvas.clientWidth, h = canvas.clientHeight;
-    if (canvas.width !== w || canvas.height !== h) {
-      renderer.setSize(w, h, false);
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-    }
-  }
-
-  return { renderer, scene, camera, controls, resize };
-}
-
-// Materials
-const boneMat = (c = 0xf1e5c9) => new THREE.MeshPhysicalMaterial({
-  color: c, roughness: 0.45, clearcoat: 0.5, clearcoatRoughness: 0.25, sheen: 0.3, sheenColor: 0xffe5b8
-});
-const muscleMat = () => new THREE.MeshPhysicalMaterial({
-  color: 0x9b1a20, roughness: 0.35, clearcoat: 0.6, sheen: 1, sheenColor: 0xff6675
-});
-const cartMat = () => new THREE.MeshPhysicalMaterial({
-  color: 0xa8c8e8, transparent: true, opacity: 0.5, roughness: 0.1, transmission: 0.5, thickness: 0.5
-});
-
-// ─────────────────────────────────────────────
-// HERO SKELETON (skull, spine, ribs, pelvis)
-// ─────────────────────────────────────────────
-function buildSkeleton() {
-  const g = new THREE.Group();
-
-  // Skull
-  const skull = new THREE.Group();
-  skull.position.set(0, 2.7, 0.05);
-  const cranium = new THREE.Mesh(new THREE.SphereGeometry(0.55, 48, 48), boneMat(0xf5ebd4));
-  skull.add(cranium);
-  for (const s of [-1, 1]) {
-    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.11, 24, 24), new THREE.MeshStandardMaterial({ color: 0x1a1410 }));
-    eye.position.set(s * 0.18, 0.05, 0.46); skull.add(eye);
-  }
-  const nasal = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.18, 4), new THREE.MeshStandardMaterial({ color: 0x1a1410 }));
-  nasal.position.set(0, -0.1, 0.5); skull.add(nasal);
-  const jaw = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.07, 12, 24, Math.PI), boneMat(0xefe1c4));
-  jaw.position.set(0, -0.42, 0.18); jaw.rotation.x = 0.2; skull.add(jaw);
-  g.add(skull);
-
-  // Vertebrae stack
-  for (let i = 0; i < 14; i++) {
-    const v = new THREE.Group();
-    v.position.set(0, 2.0 - i * 0.28, 0);
-    v.scale.setScalar(1 + i * 0.015);
-    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.20, 0.12, 24), boneMat());
-    v.add(body);
-    const spinous = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.10, 0.18), boneMat(0xe6d8b8));
-    spinous.position.set(0, 0, -0.18); v.add(spinous);
-    for (const s of [-1, 1]) {
-      const tp = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.14), boneMat(0xe6d8b8));
-      tp.position.set(s * 0.18, 0, -0.05); tp.rotation.z = s * 0.4; v.add(tp);
-    }
-    g.add(v);
-  }
-
-  // Ribs
-  for (let i = 0; i < 6; i++) {
-    const y = 1.55 - i * 0.28;
-    const len = 1.2 + i * 0.05;
-    for (const side of [1, -1]) {
-      const curve = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(0, y, -0.18),
-        new THREE.Vector3(side * len * 0.5, y - 0.05, 0.1),
-        new THREE.Vector3(side * len * 0.85, y - 0.15, 0.6),
-        new THREE.Vector3(side * len * 0.55, y - 0.25, 1.0),
-        new THREE.Vector3(side * 0.05, y - 0.3, 1.15),
-      ]);
-      const rib = new THREE.Mesh(new THREE.TubeGeometry(curve, 40, 0.045, 8, false), boneMat(0xefe3c8));
-      g.add(rib);
-    }
-  }
-
-  // Sternum
-  const sternum = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.4, 0.08), boneMat(0xf0e3c5));
-  sternum.position.set(0, 1.0, 1.1); g.add(sternum);
-
-  // Pelvis
-  const pelvis = new THREE.Group(); pelvis.position.set(0, -1.6, 0);
-  const top = new THREE.Mesh(new THREE.TorusGeometry(0.55, 0.16, 16, 32, Math.PI), boneMat(0xede0c2));
-  pelvis.add(top);
-  const bot = new THREE.Mesh(new THREE.TorusGeometry(0.45, 0.13, 16, 32, Math.PI), boneMat(0xede0c2));
-  bot.position.y = -0.1; bot.rotation.x = Math.PI; pelvis.add(bot);
-  g.add(pelvis);
-
-  return g;
-}
-
-(function initHero() {
-  const canvas = document.getElementById('hero-canvas');
-  const { renderer, scene, camera, controls, resize } = createScene(canvas, { cam: [0, 0.5, 7], fov: 42 });
-  const skel = buildSkeleton();
-  scene.add(skel);
-
-  function tick() {
-    resize();
-    const t = performance.now() * 0.001;
-    skel.rotation.y = t * 0.25;
-    skel.position.y = Math.sin(t * 0.6) * 0.08 - 0.2;
-    controls && controls.update();
-    renderer.render(scene, camera);
-    requestAnimationFrame(tick);
-  }
-  tick();
-})();
-
-// ─────────────────────────────────────────────
-// BONES — femur
-// ─────────────────────────────────────────────
-(function initBones() {
-  const canvas = document.getElementById('bones-canvas');
-  const { renderer, scene, camera, controls, resize } = createScene(canvas, { cam: [0, 0, 6] });
-  const g = new THREE.Group();
-  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.26, 3.2, 32), boneMat(0xf3e7cb));
-  g.add(shaft);
-  // condyles
-  const cl = new THREE.Mesh(new THREE.SphereGeometry(0.36, 32, 32), boneMat(0xf5ead0));
-  cl.position.set(-0.2, -1.65, 0); g.add(cl);
-  const cr = cl.clone(); cr.position.x = 0.2; g.add(cr);
-  // head + neck
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.38, 32, 32), boneMat(0xf5ead0));
-  head.position.set(-0.95, 1.85, 0); g.add(head);
-  const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.20, 0.6, 24), boneMat(0xf0e3c4));
-  neck.position.set(-0.55, 1.65, 0); neck.rotation.z = Math.PI / 4; g.add(neck);
-  // greater trochanter
-  const gt = new THREE.Mesh(new THREE.SphereGeometry(0.26, 24, 24), boneMat(0xefe1c2));
-  gt.position.set(0.18, 1.6, 0); g.add(gt);
-  scene.add(g);
-
-  function tick() {
-    resize();
-    const t = performance.now() * 0.001;
-    g.rotation.y = t * 0.4;
-    g.rotation.z = Math.sin(t * 0.3) * 0.15;
-    controls && controls.update();
-    renderer.render(scene, camera);
-    requestAnimationFrame(tick);
-  }
-  tick();
-})();
-
-// ─────────────────────────────────────────────
-// MUSCLES — bundle of contracting fibers
-// ─────────────────────────────────────────────
-(function initMuscles() {
-  const canvas = document.getElementById('muscles-canvas');
-  const { renderer, scene, camera, controls, resize } = createScene(canvas, { cam: [0, 0, 6] });
-
-  const bundle = new THREE.Group();
-  const fibers = [];
-  for (let i = 0; i < 18; i++) {
-    const angle = (i / 18) * Math.PI * 2;
-    const r = 0.35 + Math.random() * 0.15;
-    const ox = Math.cos(angle) * r, oz = Math.sin(angle) * r;
-    const curve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, -2, 0),
-      new THREE.Vector3(ox * 0.8, -1, oz * 0.8),
-      new THREE.Vector3(ox, 0, oz),
-      new THREE.Vector3(ox * 0.8, 1, oz * 0.8),
-      new THREE.Vector3(0, 2, 0),
-    ]);
-    const m = new THREE.Mesh(new THREE.TubeGeometry(curve, 60, 0.06, 12, false), muscleMat());
-    m.userData.phase = i * 0.4;
-    bundle.add(m);
-    fibers.push(m);
-  }
-  // tendons
-  for (const y of [2, -2]) {
-    const t = new THREE.Mesh(new THREE.ConeGeometry(0.45, 0.7, 24), boneMat(0xe8d9b5));
-    t.position.y = y; if (y < 0) t.rotation.x = Math.PI;
-    bundle.add(t);
-  }
-  scene.add(bundle);
-
-  function tick() {
-    resize();
-    const t = performance.now() * 0.001;
-    bundle.rotation.y = t * 0.3;
-    fibers.forEach(f => {
-      const c = 1 + Math.sin(t * 1.5 + f.userData.phase) * 0.1;
-      f.scale.set(1 / Math.sqrt(c), c, 1 / Math.sqrt(c));
-    });
-    controls && controls.update();
-    renderer.render(scene, camera);
-    requestAnimationFrame(tick);
-  }
-  tick();
-})();
-
-// ─────────────────────────────────────────────
-// JOINTS — knee articulating
-// ─────────────────────────────────────────────
-(function initJoints() {
-  const canvas = document.getElementById('joints-canvas');
-  const { renderer, scene, camera, controls, resize } = createScene(canvas, { cam: [0, 0.2, 6.5] });
-
-  const root = new THREE.Group();
-  // femur (upper)
-  const upper = new THREE.Group(); upper.position.y = 1.2;
-  const femur = new THREE.Mesh(new THREE.CylinderGeometry(0.20, 0.24, 2.0, 24), boneMat());
-  upper.add(femur);
-  const cond = new THREE.Mesh(new THREE.SphereGeometry(0.36, 32, 32), boneMat(0xf5ead0));
-  cond.position.y = -1.1; upper.add(cond);
-  root.add(upper);
-  // cartilage
-  const cart = new THREE.Mesh(new THREE.SphereGeometry(0.4, 24, 24), cartMat());
-  cart.position.y = 0.1; root.add(cart);
-  // tibia (lower) — rotates
-  const lower = new THREE.Group();
-  const tibia = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.18, 2.0, 24), boneMat(0xefe3c5));
-  tibia.position.y = -1.2; lower.add(tibia);
-  const plateau = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.18, 32), boneMat(0xf3e7c9));
-  plateau.position.y = -0.05; lower.add(plateau);
-  const patella = new THREE.Mesh(new THREE.SphereGeometry(0.20, 24, 24), boneMat(0xf0e2c2));
-  patella.position.set(0, 0, 0.45); lower.add(patella);
-  root.add(lower);
-  scene.add(root);
-
-  function tick() {
-    resize();
-    const t = performance.now() * 0.001;
-    const flex = (Math.sin(t * 0.8) + 1) * 0.5;
-    lower.rotation.x = -0.05 + flex * 1.4;
-    root.rotation.y = Math.sin(t * 0.3) * 0.5;
-    controls && controls.update();
-    renderer.render(scene, camera);
-    requestAnimationFrame(tick);
-  }
-  tick();
-})();
-
-// ─────────────────────────────────────────────
-// SPINE — vertebrae column with one highlighted
-// ─────────────────────────────────────────────
-(function initSpine() {
-  const canvas = document.getElementById('spine-canvas');
-  const { renderer, scene, camera, controls, resize } = createScene(canvas, { cam: [0, 0, 7] });
-
-  const spine = new THREE.Group();
-  const N = 18, hot = 9;
-  for (let i = 0; i < N; i++) {
-    const v = new THREE.Group();
-    const curveX = Math.sin(i * 0.4) * 0.18;
-    v.position.set(curveX, 2.8 - i * 0.34, 0);
-    v.rotation.z = curveX * 0.3;
-    const isHot = i === hot;
-    const body = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.24, 0.26, 0.18, 24),
-      isHot
-        ? new THREE.MeshPhysicalMaterial({ color: 0xff3344, emissive: 0xff2233, emissiveIntensity: 0.6, roughness: 0.45, clearcoat: 0.5 })
-        : boneMat()
-    );
-    v.add(body);
-    const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.20, 0.20, 0.07, 24), cartMat());
-    disc.position.y = -0.13; v.add(disc);
-    spine.add(v);
-  }
-  scene.add(spine);
-
-  function tick() {
-    resize();
-    const t = performance.now() * 0.001;
-    spine.rotation.y = Math.sin(t * 0.4) * 0.6;
-    controls && controls.update();
-    renderer.render(scene, camera);
-    requestAnimationFrame(tick);
-  }
-  tick();
-})();
-</script>
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
 </body>
 </html>
